@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 		/* 
 		   mask to describe the structure of the input
 		   0 for command, 1 for argument, 2 for infile, 3 for outfile
-		   4 for <, 5 for >, 6 for | 
+		   4 for <, 5 for >, 6 for |, 7 for &
 		*/
 		int mask[number_of_tokens];
 		//initialize mask to known values
@@ -56,24 +56,46 @@ int main(int argc, char *argv[]) {
 		//determine what each token represents
 		for(i = 0; i < number_of_tokens; i++){
 			if(i == 0){
+				//printf("command ");
 				mask[i] = 0;
-			}else if(strcmp(tokens[i], "|") == 0){
+			}else if(*tokens[i] == '|'){
+				//printf("pipe ");
 				mask[i] = 6;
+			}else if(*tokens[i] == '&'){
+				//printf("background ");
+				mask[i] = 7;
 			}else if(mask[i - 1] == 6){
+				//printf("command ");
 				mask[i] = 0;
-			}else if(strcmp(tokens[i], "<") == 0){
+			}else if(*tokens[i] == '<'){
+				//printf("redirect input ");
 				mask[i] = 4;
-			}else if(strcmp(tokens[i], ">") == 0){
+			}else if(*tokens[i] == '>'){
+				//printf("redirect output ");
 				mask[i] = 5;
 			}else if(mask[i - 1] == 4){
+				//printf("infile ");
 				mask[i] = 2;
 			}else if(mask[i - 1] == 5){
+				//printf("outfile ");
 				mask[i] = 3;
 			}else{
+				//printf("argument ");
 				mask[i] = 1;	
 			}
 		}
-		
-			
+		//for(i = 0; i < number_of_tokens; i++){
+		//		printf("%d", mask[i]);
+		//}
+		//printf("\n");	
+		//int fork_rtn, child_status;
+		//if (fork_rtn = fork()) {
+		//	wait(&child_status);
+		//} else {	
+		//	if (execv("/bin/ls", (char* []){"/bin/ls", "-l" ,NULL}) == -1) {
+		//		fprintf(stderr,"%s: Unable to execute\n", tokens[0]);
+		//		exit(-1);
+		//	}
+		//}
 	}
 }

@@ -49,31 +49,20 @@ int main(int argc, char *argv[]) {
 		for(i = 0; i < number_of_tokens; i++){
 			if(i == 0){
 				mask[i] = 0;
-				printf("%s is a command\n", tokens[i]);
 			}else if(strcmp(tokens[i], "|") == 0){
 				mask[i] = 6;
-				printf("%s is a pipe\n", tokens[i]);
 			}else if(mask[i - 1] == 6){
 				mask[i] = 0;
-				printf("%s is a command\n", tokens[i]);
 			}else if(strcmp(tokens[i], "<") == 0){
 				mask[i] = 4;
-				printf("%s is an input redirect\n", tokens[i]);
 			}else if(strcmp(tokens[i], ">") == 0){
 				mask[i] = 5;
-				printf("%s is an output redirect\n", tokens[i]);
-			}
-			else if(mask[i - 1] == 4){
+			}else if(mask[i - 1] == 4){
 				mask[i] = 2;
-				printf("%s is an input file\n", tokens[i]);
-			}
-			else if(mask[i - 1] == 5){
+			}else if(mask[i - 1] == 5){
 				mask[i] = 3;
-				printf("%s is an output file\n", tokens[i]);
-			}
-			else{
-				mask[i] = 1;
-				printf("%s is an argument\n", tokens[i]);	
+			}else{
+				mask[i] = 1;	
 			}
 		}	
 	}

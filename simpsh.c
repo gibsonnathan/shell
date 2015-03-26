@@ -1,4 +1,5 @@
-/* 
+/*
+ *  
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,10 +29,13 @@ int main(int argc, char *argv[]) {
 	}
 	while(1){
 		int i = 0;
+		//determine whether or not to print a prompt
 		if(interactive == 1)
 			printf("%% ");
+		//get input
 		if(fgets(line, MAX_LENGTH, stdin) == NULL)
 			return 0;
+		//tokenize input and store it in an array
 		token = strtok(line, " ");
 		while(token != NULL){
 				tokens[i] = token;
@@ -39,13 +43,17 @@ int main(int argc, char *argv[]) {
 				i++;
 		}
 		number_of_tokens = i;
-		//mask to describe the structure of the input
-		//0 for command, 1 for argument, 2 for infile, 3 for outfile
-		//4 for <, 5 for >, 6 for |
+		/* 
+		   mask to describe the structure of the input
+		   0 for command, 1 for argument, 2 for infile, 3 for outfile
+		   4 for <, 5 for >, 6 for | 
+		*/
 		int mask[number_of_tokens];
+		//initialize mask to known values
 		for(i = 0; i < number_of_tokens; i++){
 			mask[i] = -1;
 		}
+		//determine what each token represents
 		for(i = 0; i < number_of_tokens; i++){
 			if(i == 0){
 				mask[i] = 0;
@@ -64,6 +72,8 @@ int main(int argc, char *argv[]) {
 			}else{
 				mask[i] = 1;	
 			}
-		}	
+		}
+		
+			
 	}
 }

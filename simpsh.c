@@ -85,14 +85,17 @@ int main(int argc, char *argv[]) {
 		}
 		
 		char* cmd;
-		char* args[3] = {cmd, NULL, NULL};
+		char* args[3] = {NULL, NULL, NULL};
 		for(i = 0; i < number_of_tokens; i++){
 			
 			if(mask[i] == 0){
 				cmd = tokens[i];
+				args[0] = cmd;
 			}
 			else if(mask[i] == 1){
+				args[0] = tokens[i-1];
 				args[1] = tokens[i];
+				args[2] = NULL;
 			}
 			else if(mask[i] == 2){
 					
@@ -113,7 +116,7 @@ int main(int argc, char *argv[]) {
 					
 			}		
 		}
-		
+	
 		int fork_rtn, child_status;
 			if (fork_rtn = fork()) {
 				wait(&child_status);

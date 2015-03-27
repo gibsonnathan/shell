@@ -1,6 +1,6 @@
 /*
  *  
-*/
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -86,8 +86,9 @@ int main(int argc, char *argv[]) {
 		
 		char* cmd;
 		char* args[3] = {NULL, NULL, NULL};
+		char* infile;
+		char* outfile;
 		for(i = 0; i < number_of_tokens; i++){
-			
 			if(mask[i] == 0){
 				cmd = tokens[i];
 				args[0] = cmd;
@@ -98,10 +99,28 @@ int main(int argc, char *argv[]) {
 				args[2] = NULL;
 			}
 			else if(mask[i] == 2){
-					
+				infile = tokens[i];
+				int input_fd;
+				if ((input_fd = open(infile, O_RDONLY)) >= 0) {
+					close(0);
+					dup2(input_fd, 0);
+				} else {
+					fprintf(stderr,
+					"%s: Unable to open file 'this'.\n", argv[0]);
+					exit(1);
+				}
 			}
 			else if(mask[i] == 3){
-					
+				outfile = tokens[i];
+				int output_fd;
+				if ((output_fd = creat(outfile, S_IRUSR | S_IWUSR)) >= 0) {
+					close(1);
+					dup2(output_fd, 1);
+					fchmod(output_fd, S_IRUSR | S_IWUSR | S_IRGRP);
+				} else {
+					fprintf(stderr, "%s: Unable to create file 'that'.\n", argv[0]);
+					exit(2);
+				}	
 			}
 			else if(mask[i] == 4){
 					
@@ -116,7 +135,7 @@ int main(int argc, char *argv[]) {
 					
 			}		
 		}
-	
+
 		int fork_rtn, child_status;
 			if (fork_rtn = fork()) {
 				wait(&child_status);

@@ -10,13 +10,14 @@
 #include <fcntl.h>
 #include <string.h>
 #include <stdio.h>
-#define MAX_LENGTH 1024
+#define MAX_LENGTH 256
 int main(int argc, char *argv[]) {
 	int interactive;
 	char line[MAX_LENGTH];
 	char* tokens[MAX_LENGTH];
 	char* token;
 	int number_of_tokens;
+	int number_of_commands;
 	if(argc == 2){
 		if(strcmp("-i", argv[1]) == 0){
 			interactive = 1;
@@ -35,6 +36,8 @@ int main(int argc, char *argv[]) {
 		//get input
 		if(fgets(line, MAX_LENGTH, stdin) == NULL)
 			return 0;
+		//get rid of trailing \n
+		line[strlen(line) - 1] = '\0';
 		//tokenize input and store it in an array
 		token = strtok(line, " ");
 		while(token != NULL){
@@ -75,19 +78,50 @@ int main(int argc, char *argv[]) {
 				mask[i] = 1;	
 			}
 		}
-		
-		int fork_rtn, child_status;
 		for(i = 0; i < number_of_tokens; i++){
-			if (fork_rtn = fork()) {
-				if(mask[i + 1] != 7){
-					wait(&child_status);
-				}else {
-				//child
-				
-				
-				}
+			if(mask[i] == 6){
+				number_of_commands++;
 			}
 		}
+		
+		char* cmd;
+		char* args[3] = {cmd, NULL, NULL};
+		for(i = 0; i < number_of_tokens; i++){
+			
+			if(mask[i] == 0){
+				cmd = tokens[i];
+			}
+			else if(mask[i] == 1){
+				args[1] = tokens[i];
+			}
+			else if(mask[i] == 2){
+					
+			}
+			else if(mask[i] == 3){
+					
+			}
+			else if(mask[i] == 4){
+					
+			}
+			else if(mask[i] == 5){
+					
+			}
+			else if(mask[i] == 6){
+					
+			}
+			else if(mask[i] == 7){
+					
+			}		
+		}
+		
+		int fork_rtn, child_status;
+			if (fork_rtn = fork()) {
+				wait(&child_status);
+			}else{	
+				if(execvp(args[0], args) == -1){
+					fprintf(stderr, "exec error\n");
+				}
+			}
 	}
 }
 	

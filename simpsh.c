@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 	char* tokens[MAX_LENGTH];
 	char* token;
 	int number_of_tokens;
-	int number_of_commands;
+	int number_of_commands = 1;
 	if(argc == 2){
 		if(strcmp("-i", argv[1]) == 0){
 			interactive = 1;
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
 		char* outfile;
 		int output_fd;
 		int input_fd;
-	
+		
 		for(i = 0; i < number_of_tokens; i++){
 			if(mask[i] == 0){
 				cmd = tokens[i];
@@ -108,42 +108,44 @@ int main(int argc, char *argv[]) {
 					
 			}
 			else if(mask[i] == 7){
-					
+				
 			}		
 		}
-
-		int fork_rtn, child_status;
-		if (fork_rtn = fork()) {
-			wait(&child_status);
-		}else{	
-			for(i = 0; i < number_of_tokens; i++){
-				if(mask[i] == 2){
-					infile = tokens[i];
-					if ((input_fd = open(infile, O_RDONLY)) >= 0) {
-						close(0);
-						dup2(input_fd, 0);
-					} else {
-						fprintf(stderr, "Unable to open file.\n");
-						exit(1);
+		if(number_of_commands == 1){	
+			int fork_rtn, child_status;
+			if (fork_rtn = fork()) {
+				wait(&child_status);
+			}else{	
+				for(i = 0; i < number_of_tokens; i++){
+					if(mask[i] == 2){
+						infile = tokens[i];
+						if ((input_fd = open(infile, O_RDONLY)) >= 0) {
+							close(0);
+							dup2(input_fd, 0);
+						} else {
+							fprintf(stderr, "Unable to open file.\n");
+							exit(1);
+						}
+					}
+					else if(mask[i] == 3){
+						outfile = tokens[i];
+						if ((output_fd = creat(outfile, S_IRUSR | S_IWUSR)) >= 0) {
+							close(1);
+							dup2(output_fd, 1);
+							fchmod(output_fd, S_IRUSR | S_IWUSR | S_IRGRP);
+						} else {
+							fprintf(stderr, "Unable to create file.\n");
+							exit(2);
+						}	
 					}
 				}
-				else if(mask[i] == 3){
-					outfile = tokens[i];
-					if ((output_fd = creat(outfile, S_IRUSR | S_IWUSR)) >= 0) {
-						close(1);
-						dup2(output_fd, 1);
-						fchmod(output_fd, S_IRUSR | S_IWUSR | S_IRGRP);
-					} else {
-						fprintf(stderr, "Unable to create file.\n");
-						exit(2);
-					}	
+				
+				if(execvp(args[0], args) == -1){
+					fprintf(stderr, "exec error\n");
 				}
 			}
-			
-			if(execvp(args[0], args) == -1){
-				fprintf(stderr, "exec error\n");
-			}
 		}
+			
 	}
 }
 	

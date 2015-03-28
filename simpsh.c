@@ -93,6 +93,7 @@ int main(int argc, char *argv[]) {
 		char* outfile;
 		int output_fd;
 		int input_fd;
+		int tube[2];
 		
 		for(i = 0; i < number_of_tokens; i++){
 			if(mask[i] == 0){
@@ -105,7 +106,13 @@ int main(int argc, char *argv[]) {
 				args[2] = NULL;
 			}
 			else if(mask[i] == 6){
+				if(number_of_commands > 1){
+					if (pipe(tube)) {
+						fprintf(stderr, "Unable to create pipe.\n");
+						exit(-1);
+					}
 					
+				}	
 			}
 			else if(mask[i] == 7){
 				

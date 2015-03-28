@@ -124,7 +124,6 @@ int main(int argc, char *argv[]) {
 		
 		//handle the case that there is only one command
 		if(number_of_commands == 1){	
-			
 			if (fork_rtn = fork()) {
 				wait(&child_status);
 			}else{	

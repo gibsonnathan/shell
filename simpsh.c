@@ -81,12 +81,13 @@ int main(int argc, char *argv[]) {
 				mask[i] = 1;	
 			}
 		}
+		//find out how many commands are on the line
 		for(i = 0; i < number_of_tokens; i++){
 			if(mask[i] == 6){
 				number_of_commands++;
 			}
 		}
-		
+		//store data associated with each command
 		char* cmd;
 		char* args[3] = {NULL, NULL, NULL};
 		char* infile;
@@ -94,7 +95,10 @@ int main(int argc, char *argv[]) {
 		int output_fd;
 		int input_fd;
 		int tube[2];
+		int fork_rtn, child_status;
 		
+		//parse each element and pull out commands
+		//arguments, etc.
 		for(i = 0; i < number_of_tokens; i++){
 			if(mask[i] == 0){
 				cmd = tokens[i];
@@ -110,16 +114,17 @@ int main(int argc, char *argv[]) {
 					if (pipe(tube)) {
 						fprintf(stderr, "Unable to create pipe.\n");
 						exit(-1);
-					}
-					
+					}			
 				}	
 			}
 			else if(mask[i] == 7){
 				
 			}		
 		}
+		
+		//handle the case that there is only one command
 		if(number_of_commands == 1){	
-			int fork_rtn, child_status;
+			
 			if (fork_rtn = fork()) {
 				wait(&child_status);
 			}else{	
@@ -152,7 +157,6 @@ int main(int argc, char *argv[]) {
 				}
 			}
 		}
-			
 	}
 }
 	

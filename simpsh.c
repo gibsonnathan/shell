@@ -93,9 +93,7 @@ int main(int argc, char *argv[]) {
 		char* outfile;
 		int output_fd;
 		int input_fd;
-		int save_in, save_out;
-		save_in = dup(STDIN_FILENO);
-		save_out = dup(STDOUT_FILENO);
+	
 		for(i = 0; i < number_of_tokens; i++){
 			if(mask[i] == 0){
 				cmd = tokens[i];
@@ -106,29 +104,6 @@ int main(int argc, char *argv[]) {
 				args[1] = tokens[i];
 				args[2] = NULL;
 			}
-			
-			else if(mask[i] == 2){
-				infile = tokens[i];
-				if ((input_fd = open(infile, O_RDONLY)) >= 0) {
-					close(0);
-					dup2(input_fd, 0);
-				} else {
-					fprintf(stderr, "Unable to open file.\n");
-					exit(1);
-				}
-			}
-			else if(mask[i] == 3){
-				outfile = tokens[i];
-				if ((output_fd = creat(outfile, S_IRUSR | S_IWUSR)) >= 0) {
-					close(1);
-					dup2(output_fd, 1);
-					fchmod(output_fd, S_IRUSR | S_IWUSR | S_IRGRP);
-				} else {
-					fprintf(stderr, "Unable to create file.\n");
-					exit(2);
-				}	
-			}
-			 
 			else if(mask[i] == 6){
 					
 			}
@@ -139,10 +114,32 @@ int main(int argc, char *argv[]) {
 
 		int fork_rtn, child_status;
 		if (fork_rtn = fork()) {
-			dup2(save_in, STDIN_FILENO);
-			dup2(save_out, STDOUT_FILENO);
 			wait(&child_status);
 		}else{	
+			for(i = 0; i < number_of_tokens; i++){
+				if(mask[i] == 2){
+					infile = tokens[i];
+					if ((input_fd = open(infile, O_RDONLY)) >= 0) {
+						close(0);
+						dup2(input_fd, 0);
+					} else {
+						fprintf(stderr, "Unable to open file.\n");
+						exit(1);
+					}
+				}
+				else if(mask[i] == 3){
+					outfile = tokens[i];
+					if ((output_fd = creat(outfile, S_IRUSR | S_IWUSR)) >= 0) {
+						close(1);
+						dup2(output_fd, 1);
+						fchmod(output_fd, S_IRUSR | S_IWUSR | S_IRGRP);
+					} else {
+						fprintf(stderr, "Unable to create file.\n");
+						exit(2);
+					}	
+				}
+			}
+			
 			if(execvp(args[0], args) == -1){
 				fprintf(stderr, "exec error\n");
 			}

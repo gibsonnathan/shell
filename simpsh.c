@@ -185,6 +185,10 @@ int main(int argc, char *argv[]) {
 				
 		int tube[2];
 		for(i = 0; i < number_of_commands; i++){
+			if (pipe(tube)) {
+				fprintf(stderr, "Unable to create pipe.");
+				exit(-1);
+			}
 			exec_single_command(commands[i], tube);	
 		}
 	}

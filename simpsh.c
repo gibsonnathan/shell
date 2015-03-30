@@ -13,6 +13,7 @@
 #define MAX_LENGTH 256
 
 void exec_single_command(char* command, int pipe[]){
+	//removing space at the beginning of commands caused by strtok()
 	if(isspace(command[0])){
 		*command++;
 	}
@@ -20,6 +21,8 @@ void exec_single_command(char* command, int pipe[]){
 	char* command_token;
 	char* command_tokens[MAX_LENGTH];
 	int number_of_command_tokens = 0;
+	
+	//tokenize the parts of the command
 	command_token = strtok(command, " ");
 	while(command_token != NULL){
 		command_tokens[i] = command_token;
@@ -28,7 +31,13 @@ void exec_single_command(char* command, int pipe[]){
 	}
 	number_of_command_tokens = i;
 	
+	/* 
+		   mask to describe the structure of the input
+		   0 for command, 1 for argument, 2 for infile, 3 for outfile      
+		   4 for <, 5 for >
+	*/
 	int mask[number_of_command_tokens];
+	
 	//initialize mask to known values
 	for(i = 0; i < number_of_command_tokens; i++){
 		mask[i] = -1;
@@ -53,13 +62,13 @@ void exec_single_command(char* command, int pipe[]){
 		}
 	}
 	
+	//command attributes
 	char* cmd;
 	char* args[3] = {NULL, NULL, NULL};
 	char* infile;
 	char* outfile;
 	int output_fd;
 	int input_fd;
-	int tube[2];
 	int fork_rtn, child_status;
 	
 	//parse each element and pull out commands
@@ -127,19 +136,24 @@ int main(int argc, char *argv[]) {
 		int number_of_tokens;
 		int number_of_commands = 1;
 		int i = 0;
+		
 		//determine whether or not to print a prompt
 		if(interactive == 1)
 			printf("%% ");
+			
 		//get input
 		if(fgets(line, MAX_LENGTH, stdin) == NULL){
-			fprintf(stderr, "fgets quiting");
+			fprintf(stderr, "fgets error");
 			return 0;
 		}
+		
 		//get rid of trailing \n
 		line[strlen(line) - 1] = '\0';
+		
 		//make copy of the line, so that I have another to tokenize
 		char line_copy[strlen(line)];
 		strcpy(line_copy, line);
+		
 		//tokenize the line by spaces and store each
 		//element in an array
 		token = strtok(line, " ");
@@ -149,14 +163,17 @@ int main(int argc, char *argv[]) {
 			i++;
 		}
 		number_of_tokens = i;
+		
 		//find out how many commands are on the line
 		for(i = 0; i < number_of_tokens; i++){
 			if(*tokens[i] == '|'){
 				number_of_commands++;
 			}
 		}
+		
 		//tokenize the line based on the
-		//pipe symbol
+		//pipe symbol, breaking the line
+		//into individual commands
 		i = 0;
 		char* commands[number_of_commands];
 		token = strtok(line_copy, "|");

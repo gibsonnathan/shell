@@ -143,7 +143,6 @@ int main(int argc, char *argv[]) {
 			
 		//get input
 		if(fgets(line, MAX_LENGTH, stdin) == NULL){
-			fprintf(stderr, "fgets error");
 			return 0;
 		}
 		

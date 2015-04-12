@@ -84,24 +84,44 @@ void exec_single_command(char* command, int index, int number_of_commands){
 			args[2] = NULL;
 		}		
 		else if(mask[i] == 7){
-	
+			bg = 1;
 		}
 	}
 	
-	if (fork_rtn = fork()) {	
-		wait(&child_status);
+	int filedes[2]; 
+	int filedes2[2];
+	
+	if (index % 2 != 0){
+		pipe(filedes); 
 	}else{
+		pipe(filedes2); 
+	}
+	
+	if (fork_rtn = fork()) {	
+		if(bg != 1)
+			wait(&child_status);
+	}else{
+		if(number_of_commands > 1){
+			if(index == 0){
+				dup2(filedes2[1], STDOUT_FILENO);
+			}
+			else if(index == number_of_commands - 1){
+				if (number_of_commands % 2 != 0){ 
+					dup2(filedes[0],STDIN_FILENO);
+				}else{ 
+					dup2(filedes2[0],STDIN_FILENO);
+				} 
+			}else{ 
+				if (i % 2 != 0){
+					dup2(filedes2[0],STDIN_FILENO); 
+					dup2(filedes[1],STDOUT_FILENO);
+				}else{ 
+					dup2(filedes[0],STDIN_FILENO); 
+					dup2(filedes2[1],STDOUT_FILENO);					
+				} 
+			}
+		}
 		
-		if(index != 0){
-			
-		}
-		if(index != number_of_commands - 1){
-			
-		}
-		else{
-			
-		}
-			
 		for(i = 0; i < number_of_command_tokens; i++){
 			if(mask[i] == 2){
 				infile = command_tokens[i];
@@ -131,6 +151,25 @@ void exec_single_command(char* command, int index, int number_of_commands){
 		}	
 		
 	}	
+	
+	if (index == 0){
+		close(filedes2[1]);
+	}
+	else if (index == number_of_commands - 1){
+		if (number_of_commands % 2 != 0){					
+			close(filedes[0]);
+		}else{					
+			close(filedes2[0]);
+		}
+	}else{
+		if (index % 2 != 0){					
+			close(filedes2[0]);
+			close(filedes[1]);
+		}else{					
+			close(filedes[0]);
+			close(filedes2[1]);
+		}
+	}
 }
 
 int main(int argc, char *argv[]) {

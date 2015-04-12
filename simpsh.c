@@ -101,6 +101,16 @@ int main(int argc, char *argv[]) {
 		}
 	}
 }
+
+/*
+ * 
+ * takes a single command including its arguments, I/O redirection,
+ * and background indicator, the number of commands that have already
+ * been executed, and the total number of commands that will be
+ * executed - each command is parsed and redirects are setup before
+ * the command is executed  
+ * 
+ */
 	
 void exec_single_command(char* command, int index,int number_of_commands){    
 	
@@ -122,11 +132,10 @@ void exec_single_command(char* command, int index,int number_of_commands){
 	}
 	number_of_command_tokens = i;
 	
-	/* 
-		   mask to describe the structure of the input
-		   0 for command, 1 for argument, 2 for infile, 3 for outfile      
-		   4 for <, 5 for >
-	*/
+	
+    //mask to describe the structure of the input
+    //0 for command, 1 for argument, 2 for infile, 3 for outfile      
+    //4 for <, 5 for >
 	int mask[number_of_command_tokens];
 	
 	//initialize mask to known values

@@ -12,7 +12,7 @@
 #include <stdio.h>
 #define MAX_LENGTH 256
 
-void exec_single_command(char* command, int pipe[]){
+void exec_single_command(char* command, int pipe_array[], int index, int number_of_commands){
 	//removing space at the beginning of commands caused by strtok()
 	if(isspace(command[0])){
 		*command++;
@@ -70,7 +70,7 @@ void exec_single_command(char* command, int pipe[]){
 	int output_fd;
 	int input_fd;
 	int fork_rtn, child_status;
-	
+	int bg = 0;
 	//parse each element and pull out commands
 	//arguments, etc.
 	for(i = 0; i < number_of_command_tokens; i++){
@@ -83,10 +83,29 @@ void exec_single_command(char* command, int pipe[]){
 			args[1] = command_tokens[i];
 			args[2] = NULL;
 		}		
+		else if(mask[i] == 7){
+			bg = 1;
+		}
 	}
+	
 	if (fork_rtn = fork()) {
-		wait(&child_status);
-	}else{	
+		if(bg != 1){
+			wait(&child_status);
+			bg = 0;
+		}
+	}else{
+		
+		if(index != 0){
+			if( dup2(pipe_array[0], 0) < 0){
+                fprintf(stderr, "pipe error\n");
+            }
+		}
+		if(index != number_of_commands - 1){
+			if( dup2(pipe_array[1], 1) < 0){
+                fprintf(stderr, "pipe error\n");
+            }
+		}
+			
 		for(i = 0; i < number_of_command_tokens; i++){
 			if(mask[i] == 2){
 				infile = command_tokens[i];
@@ -111,9 +130,15 @@ void exec_single_command(char* command, int pipe[]){
 			}
 		}
 		
+		for( i = 0; i < 2 * number_of_commands; i++ ){
+				close( pipe_array[i]);
+		}
+		
 		if(execvp(args[0], args) == -1){
 			fprintf(stderr, "exec error\n");
 		}
+		
+		return;
 	}
 }
 
@@ -134,7 +159,7 @@ int main(int argc, char *argv[]) {
 		char* tokens[MAX_LENGTH];
 		char* token;
 		int number_of_tokens;
-		int number_of_commands = 1;
+		int number_of_commands = 0;
 		int i = 0;
 		
 		//determine whether or not to print a prompt
@@ -170,6 +195,13 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		
+		//only one command supplied or off by one
+		if(number_of_commands == 0 && strlen(line) > 0){
+			number_of_commands = 1;
+		}else if(number_of_commands > 0){
+			number_of_commands++;
+		}
+		
 		//tokenize the line based on the
 		//pipe symbol, breaking the line
 		//into individual commands
@@ -181,14 +213,17 @@ int main(int argc, char *argv[]) {
 			token = strtok(NULL, "|");
 			i++;
 		}
-				
-		int tube[2];
+		
+		int tubes[number_of_commands - 1][2];
+		
 		for(i = 0; i < number_of_commands; i++){
-			if (pipe(tube)) {
-				fprintf(stderr, "Unable to create pipe.");
-				exit(-1);
-			}
-			exec_single_command(commands[i], tube);	
+			if( pipe(tubes[i]) < 0 ){
+				fprintf(stderr, "pipe error\n");
+			}	
+		}
+	
+		for(i = 0; i < number_of_commands; i++){
+			exec_single_command(commands[i], tubes[i], i, number_of_commands);	
 		}
 	}
 }

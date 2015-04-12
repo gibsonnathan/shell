@@ -133,9 +133,9 @@ void exec_single_command(char* command, int index,int number_of_commands){
 	number_of_command_tokens = i;
 	
 	
-    //mask to describe the structure of the input
-    //0 for command, 1 for argument, 2 for infile, 3 for outfile      
-    //4 for <, 5 for >
+		//mask to describe the structure of the input
+		//0 for command, 1 for argument, 2 for infile, 3 for outfile      
+		//4 for <, 5 for >
 	int mask[number_of_command_tokens];
 	
 	//initialize mask to known values
@@ -170,7 +170,7 @@ void exec_single_command(char* command, int index,int number_of_commands){
 	int output_fd;
 	int input_fd;
 	int fork_rtn, child_status;
-	int bg;
+	int bg = 0;
 	//parse each element and pull out commands
 	//arguments, etc.
 	for(i = 0; i < number_of_command_tokens; i++){

@@ -12,7 +12,7 @@
 #include <stdio.h>
 #define MAX_LENGTH 256
 
-void exec_single_command(char* command, int pipe_array[], int index, int number_of_commands){
+void exec_single_command(char* command, int index, int number_of_commands){
 	//removing space at the beginning of commands caused by strtok()
 	if(isspace(command[0])){
 		*command++;
@@ -84,26 +84,22 @@ void exec_single_command(char* command, int pipe_array[], int index, int number_
 			args[2] = NULL;
 		}		
 		else if(mask[i] == 7){
-			bg = 1;
+	
 		}
 	}
 	
-	if (fork_rtn = fork()) {
-		if(bg != 1){
-			wait(&child_status);
-			bg = 0;
-		}
+	if (fork_rtn = fork()) {	
+		wait(&child_status);
 	}else{
 		
 		if(index != 0){
-			if( dup2(pipe_array[0], 0) < 0){
-                fprintf(stderr, "pipe error\n");
-            }
+			
 		}
 		if(index != number_of_commands - 1){
-			if( dup2(pipe_array[1], 1) < 0){
-                fprintf(stderr, "pipe error\n");
-            }
+			
+		}
+		else{
+			
 		}
 			
 		for(i = 0; i < number_of_command_tokens; i++){
@@ -130,16 +126,11 @@ void exec_single_command(char* command, int pipe_array[], int index, int number_
 			}
 		}
 		
-		for( i = 0; i < 2 * number_of_commands; i++ ){
-				close( pipe_array[i]);
-		}
-		
 		if(execvp(args[0], args) == -1){
 			fprintf(stderr, "exec error\n");
-		}
+		}	
 		
-		return;
-	}
+	}	
 }
 
 int main(int argc, char *argv[]) {
@@ -213,17 +204,9 @@ int main(int argc, char *argv[]) {
 			token = strtok(NULL, "|");
 			i++;
 		}
-		
-		int tubes[number_of_commands - 1][2];
-		
-		for(i = 0; i < number_of_commands; i++){
-			if( pipe(tubes[i]) < 0 ){
-				fprintf(stderr, "pipe error\n");
-			}	
-		}
 	
 		for(i = 0; i < number_of_commands; i++){
-			exec_single_command(commands[i], tubes[i], i, number_of_commands);	
+			exec_single_command(commands[i], i, number_of_commands);	
 		}
 	}
 }

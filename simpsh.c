@@ -203,6 +203,7 @@ void exec_single_command(char* command, int index,int number_of_commands){
 		if(bg != 1){
 			wait(&child_status);
 		}
+		bg = 0;
 	}else{
 		//if there is only one command dont alter its stdout, stdin
 		if(number_of_commands > 1){
